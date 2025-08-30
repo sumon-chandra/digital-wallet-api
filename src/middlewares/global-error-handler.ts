@@ -7,7 +7,7 @@ import { handlerValidationError } from "../helpers/handle-validation-error";
 import { handlerZodError } from "../helpers/handle-zod-error";
 import { IErrorSources } from "../interfaces/error.types";
 import AppError from "../helpers/app-error";
-import { envVars } from "../routes/config/env";
+import { envVars } from "../config/env";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const globalErrorHandler = async (err: any, req: Request, res: Response, next: NextFunction) => {

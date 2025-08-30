@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { UserRouter } from "../modules/user/user.route";
 
 export const router = Router();
 
@@ -7,7 +8,12 @@ interface ModuleRouterTypes {
 	route: Router;
 }
 
-const moduleRouters: ModuleRouterTypes[] = [];
+const moduleRouters: ModuleRouterTypes[] = [
+	{
+		path: "/users",
+		route: UserRouter,
+	},
+];
 
 moduleRouters.forEach((route) => {
 	router.use(route.path, route.route);
