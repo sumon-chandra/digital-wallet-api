@@ -9,7 +9,7 @@ const userSchema = new Schema<IUser>(
 		role: { type: String, enum: Object.values(Role), default: Role.USER },
 		password: { type: String },
 		isEmailVerified: { type: Boolean, default: false },
-		isActive: { type: String, enum: Object.values(IsActive), default: IsActive.INACTIVE },
+		isActive: { type: String, enum: Object.values(IsActive), default: IsActive.ACTIVE },
 		address: { type: String },
 		createdAt: { type: Date, default: Date.now },
 	},
