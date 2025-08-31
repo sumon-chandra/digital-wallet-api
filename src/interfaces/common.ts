@@ -9,3 +9,9 @@ export enum IsActive {
 	INACTIVE = "INACTIVE",
 	BLOCKED = "BLOCKED",
 }
+
+export enum WalletStatus {
+	ACTIVE = "ACTIVE",
+	INACTIVE = "INACTIVE",
+	BLOCKED = "BLOCKED",
+}

@@ -6,6 +6,7 @@ export interface IUser {
 	name: string;
 	email: string;
 	role: Role;
+	agent?: { isApproved: boolean };
 	password?: string;
 	isEmailVerified?: boolean;
 	isActive?: IsActive;

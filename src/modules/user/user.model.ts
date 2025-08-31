@@ -6,8 +6,17 @@ const userSchema = new Schema<IUser>(
 	{
 		name: { type: String, required: true },
 		email: { type: String, unique: true, required: true },
-		role: { type: String, enum: Object.values(Role), default: Role.USER },
 		password: { type: String },
+		role: { type: String, enum: Object.values(Role), default: Role.USER },
+		agent: {
+			isApproved: {
+				type: Boolean,
+				default: false,
+				required: function () {
+					return this.role === Role.AGENT;
+				},
+			},
+		},
 		isEmailVerified: { type: Boolean, default: false },
 		isActive: { type: String, enum: Object.values(IsActive), default: IsActive.ACTIVE },
 		address: { type: String },
@@ -15,5 +24,12 @@ const userSchema = new Schema<IUser>(
 	},
 	{ timestamps: true, versionKey: false }
 );
+
+userSchema.pre("save", function (next) {
+	if (this.role !== Role.AGENT) {
+		this.agent = undefined;
+	}
+	next();
+});
 
 export const User = model<IUser>("User", userSchema);

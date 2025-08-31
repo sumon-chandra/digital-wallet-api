@@ -1,8 +1,10 @@
 import { z } from "zod";
+import { Role } from "../../interfaces/common";
 
 export const createUserZodSchema = z.object({
 	name: z.string().min(2).max(100),
 	email: z.string().email(),
+	role: z.enum(Object.values(Role)).default(Role.USER),
 	password: z
 		.string()
 		.min(8, "Password should be at least 8 characters long.")
