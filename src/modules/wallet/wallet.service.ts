@@ -143,7 +143,7 @@ const sendMoney = async (senderId: string, receiverId: string, amount: number, r
 			{ session }
 		);
 
-		// Record receiver transaction (optional but useful for history)
+		// Record receiver transaction
 		await Transaction.create(
 			[
 				{
