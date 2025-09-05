@@ -6,3 +6,4 @@ import { WalletControllers } from "./wallet.controller";
 export const WalletRouter = Router();
 
 WalletRouter.post("/top-up", checkAuth(Role.USER), WalletControllers.topUpWallet);
+WalletRouter.post("/withdraw", checkAuth(Role.USER), WalletControllers.withdrawWallet);

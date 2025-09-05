@@ -5,14 +5,13 @@ import { Role, TransactionType } from "../../interfaces/common";
 import AppError from "../../helpers/app-error";
 import { Transaction } from "../transaction/transaction.model";
 
-export const topUpWallet = async (userId: string, amount: number, role: string) => {
+const topUpWallet = async (userId: string, amount: number, role: string) => {
 	if (!userId) {
 		throw new AppError(httpStatus.BAD_REQUEST, "User Not Found. Please check the User ID.");
 	}
 	if (role !== Role.USER) {
 		throw new AppError(httpStatus.FORBIDDEN, "Only general users can top up their wallet.");
 	}
-
 	if (amount < 10) {
 		throw new AppError(httpStatus.BAD_REQUEST, "Top up amount must be at least 10.");
 	}
@@ -21,7 +20,7 @@ export const topUpWallet = async (userId: string, amount: number, role: string) 
 	session.startTransaction();
 
 	try {
-		const wallet = await Wallet.findOne({ userId });
+		const wallet = await Wallet.findOne({ userId }).session(session);
 		if (!wallet) {
 			throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
 		}
@@ -58,6 +57,59 @@ export const topUpWallet = async (userId: string, amount: number, role: string) 
 	}
 };
 
+const withdrawWallet = async (userId: string, amount: number, role: string) => {
+	if (!userId) {
+		throw new AppError(httpStatus.BAD_REQUEST, "User Not Found. Please check the User ID.");
+	}
+	if (role !== Role.USER) {
+		throw new AppError(httpStatus.FORBIDDEN, "Only general users can withdraw from their wallet.");
+	}
+	if (amount < 10) {
+		throw new AppError(httpStatus.BAD_REQUEST, "Withdrawal amount must be at least 10.");
+	}
+
+	const session = await mongoose.startSession();
+	session.startTransaction();
+
+	try {
+		const wallet = await Wallet.findOne({ userId }).session(session);
+		if (!wallet) {
+			throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
+		}
+
+		if (wallet.balance < amount) throw new AppError(httpStatus.BAD_REQUEST, "Insufficient balance");
+
+		const balanceBefore = wallet.balance;
+		wallet.balance -= amount;
+
+		await wallet.save({ session });
+
+		const transaction = await Transaction.create(
+			[
+				{
+					userId,
+					walletId: wallet._id,
+					type: TransactionType.WITHDRAW,
+					amount,
+					balanceBefore,
+					balanceAfter: wallet.balance,
+				},
+			],
+			{ session }
+		);
+
+		await session.commitTransaction();
+		session.endSession();
+
+		return { wallet, transaction: transaction[0] };
+	} catch (error) {
+		await session.abortTransaction();
+		session.endSession();
+		throw error;
+	}
+};
+
 export const WalletServices = {
 	topUpWallet,
+	withdrawWallet,
 };

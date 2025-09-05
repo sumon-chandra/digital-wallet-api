@@ -18,6 +18,20 @@ const topUpWallet = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const withdrawWallet = catchAsync(async (req: Request, res: Response) => {
+	const { amount } = req.body;
+	const { userId, role } = req.user as JwtPayload;
+	const withdrawalResponse = await WalletServices.withdrawWallet(userId, amount, role);
+
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.CREATED,
+		message: "Wallet Withdrawal Successful!",
+		data: withdrawalResponse,
+	});
+});
+
 export const WalletControllers = {
 	topUpWallet,
+	withdrawWallet,
 };
