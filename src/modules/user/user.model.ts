@@ -11,7 +11,7 @@ const userSchema = new Schema<IUser>(
 		agent: {
 			isApproved: {
 				type: Boolean,
-				default: false,
+				default: true,
 				required: function () {
 					return this.role === Role.AGENT;
 				},

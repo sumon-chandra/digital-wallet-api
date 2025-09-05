@@ -4,6 +4,7 @@ import Wallet from "../wallet/wallet.model";
 import { Role, TransactionType } from "../../interfaces/common";
 import AppError from "../../helpers/app-error";
 import { Transaction } from "../transaction/transaction.model";
+import { COMMISSION_RATE } from "./wallet.constant";
 
 const topUpWallet = async (userId: string, amount: number, role: string) => {
 	if (!userId) throw new AppError(httpStatus.BAD_REQUEST, "User Not Found. Please check the User ID.");
@@ -170,8 +171,112 @@ const sendMoney = async (senderId: string, receiverId: string, amount: number, r
 	}
 };
 
+const cashIn = async (cashInUserId: string, agentId: string, amount: number, role: string) => {
+	if (!cashInUserId) throw new AppError(httpStatus.BAD_REQUEST, "User Not Found. Please check the User ID.");
+	if (!agentId) throw new AppError(httpStatus.BAD_REQUEST, "Agent Not Found. Please check the Agent ID.");
+	if (role !== Role.AGENT) throw new AppError(httpStatus.FORBIDDEN, "Only agents can cash in to user wallets.");
+	if (amount < 1) throw new AppError(httpStatus.BAD_REQUEST, "You must cash in at least 1.");
+
+	const session = await mongoose.startSession();
+	session.startTransaction();
+
+	try {
+		const userWallet = await Wallet.findOne({ userId: cashInUserId }).session(session);
+		const agentWallet = await Wallet.findOne({ userId: agentId }).session(session);
+
+		if (!userWallet || !agentWallet) throw new AppError(httpStatus.NOT_FOUND, "Wallet not found.");
+		if (agentWallet.balance < amount) throw new AppError(httpStatus.BAD_REQUEST, "Insufficient agent balance.");
+
+		const commission = amount * COMMISSION_RATE;
+		userWallet.balance += amount;
+		agentWallet.balance -= amount;
+		agentWallet.balance += commission;
+
+		await userWallet.save({ session });
+		await agentWallet.save({ session });
+
+		await Transaction.create(
+			[
+				{
+					userId: cashInUserId,
+					walletId: userWallet._id,
+					type: TransactionType.CASH_IN,
+					amount,
+					balanceBefore: userWallet.balance - amount,
+					balanceAfter: userWallet.balance,
+					agentId,
+					commission,
+				},
+			],
+			{ session }
+		);
+
+		await session.commitTransaction();
+		session.endSession();
+
+		return { userWallet, agentWallet };
+	} catch (error) {
+		await session.abortTransaction();
+		session.endSession();
+		throw error;
+	}
+};
+
+const cashOut = async (cashOutUserId: string, agentId: string, amount: number, role: string) => {
+	if (!cashOutUserId) throw new AppError(httpStatus.BAD_REQUEST, "User Not Found. Please check the User ID.");
+	if (!agentId) throw new AppError(httpStatus.BAD_REQUEST, "Agent Not Found. Please check the Agent ID.");
+	if (role !== Role.AGENT) throw new AppError(httpStatus.FORBIDDEN, "Only agents can perform cash-out operations.");
+	if (amount < 1) throw new AppError(httpStatus.BAD_REQUEST, "You must cash out at least 1.");
+
+	const session = await mongoose.startSession();
+	session.startTransaction();
+
+	try {
+		const userWallet = await Wallet.findOne({ userId: cashOutUserId }).session(session);
+		const agentWallet = await Wallet.findOne({ userId: agentId }).session(session);
+
+		if (!userWallet || !agentWallet) throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
+		if (userWallet.balance < amount) throw new AppError(httpStatus.BAD_REQUEST, "Insufficient user balance.");
+
+		const commission = Math.round(amount * COMMISSION_RATE);
+		userWallet.balance -= amount;
+		agentWallet.balance += amount;
+		agentWallet.balance += commission;
+
+		await userWallet.save({ session });
+		await agentWallet.save({ session });
+
+		await Transaction.create(
+			[
+				{
+					userId: cashOutUserId,
+					walletId: userWallet._id,
+					type: TransactionType.CASH_OUT,
+					amount,
+					balanceBefore: userWallet.balance + amount,
+					balanceAfter: userWallet.balance,
+					agentId,
+					commission,
+				},
+			],
+			{ session }
+		);
+
+		await session.commitTransaction();
+		session.endSession();
+
+		return { userWallet, agentWallet };
+	} catch (error) {
+		await session.abortTransaction();
+		session.endSession();
+		throw error;
+	}
+};
+
 export const WalletServices = {
 	topUpWallet,
 	withdrawWallet,
 	sendMoney,
+	cashIn,
+	cashOut,
 };
