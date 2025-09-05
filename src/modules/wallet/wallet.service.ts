@@ -1,0 +1,63 @@
+import httpStatus from "http-status-codes";
+import mongoose from "mongoose";
+import Wallet from "../wallet/wallet.model";
+import { Role, TransactionType } from "../../interfaces/common";
+import AppError from "../../helpers/app-error";
+import { Transaction } from "../transaction/transaction.model";
+
+export const topUpWallet = async (userId: string, amount: number, role: string) => {
+	if (!userId) {
+		throw new AppError(httpStatus.BAD_REQUEST, "User Not Found. Please check the User ID.");
+	}
+	if (role !== Role.USER) {
+		throw new AppError(httpStatus.FORBIDDEN, "Only general users can top up their wallet.");
+	}
+
+	if (amount < 10) {
+		throw new AppError(httpStatus.BAD_REQUEST, "Top up amount must be at least 10.");
+	}
+
+	const session = await mongoose.startSession();
+	session.startTransaction();
+
+	try {
+		const wallet = await Wallet.findOne({ userId });
+		if (!wallet) {
+			throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
+		}
+
+		const balanceBefore = wallet.balance;
+		wallet.balance += amount;
+
+		await wallet.save({ session });
+
+		const transaction = await Transaction.create(
+			[
+				{
+					userId,
+					walletId: wallet._id,
+					type: TransactionType.TOP_UP,
+					amount: amount.toFixed(2),
+					balanceBefore: balanceBefore.toFixed(2),
+					balanceAfter: wallet.balance.toFixed(2),
+				},
+			],
+			{ session }
+		);
+
+		await session.commitTransaction();
+		session.endSession();
+
+		return { wallet, transaction: transaction[0] };
+	} catch (error) {
+		await session.abortTransaction();
+		session.endSession();
+		// eslint-disable-next-line no-console
+		console.log(error);
+		throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to Top Up Wallet! Please try again.");
+	}
+};
+
+export const WalletServices = {
+	topUpWallet,
+};

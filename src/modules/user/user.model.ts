@@ -17,7 +17,7 @@ const userSchema = new Schema<IUser>(
 				},
 			},
 		},
-		isEmailVerified: { type: Boolean, default: false },
+		isEmailVerified: { type: Boolean, default: true },
 		isActive: { type: String, enum: Object.values(IsActive), default: IsActive.ACTIVE },
 		address: { type: String },
 		createdAt: { type: Date, default: Date.now },
