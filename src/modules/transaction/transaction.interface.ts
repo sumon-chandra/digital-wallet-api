@@ -9,5 +9,6 @@ export interface ITransaction {
 	balanceBefore?: number;
 	balanceAfter?: number;
 	receiverId?: Types.ObjectId;
+	senderId?: Types.ObjectId;
 	createdAt?: Date;
 }

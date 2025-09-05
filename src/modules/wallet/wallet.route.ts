@@ -7,3 +7,4 @@ export const WalletRouter = Router();
 
 WalletRouter.post("/top-up", checkAuth(Role.USER), WalletControllers.topUpWallet);
 WalletRouter.post("/withdraw", checkAuth(Role.USER), WalletControllers.withdrawWallet);
+WalletRouter.post("/send-money", checkAuth(Role.USER), WalletControllers.sendMoney);

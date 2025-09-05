@@ -10,7 +10,8 @@ const transactionSchema = new Schema<ITransaction>(
 		amount: { type: Number, required: true },
 		balanceBefore: { type: Number },
 		balanceAfter: { type: Number },
-		receiverId: { type: Schema.Types.ObjectId, ref: "User" }, // Only for Sent Money
+		receiverId: { type: Schema.Types.ObjectId, ref: "User" },
+		senderId: { type: Schema.Types.ObjectId, ref: "User" },
 	},
 	{ timestamps: true, versionKey: false }
 );
@@ -18,6 +19,9 @@ const transactionSchema = new Schema<ITransaction>(
 transactionSchema.pre("save", function (next) {
 	if (this.type !== TransactionType.SEND_MONEY) {
 		this.receiverId = undefined;
+	}
+	if (this.type !== TransactionType.RECEIVE_MONEY) {
+		this.senderId = undefined;
 	}
 	next();
 });
