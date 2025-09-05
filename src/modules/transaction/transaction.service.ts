@@ -1,18 +1,26 @@
 import { FilterQuery } from "mongoose";
 import { ITransaction } from "./transaction.interface";
 import { Transaction } from "./transaction.model";
+import { JwtPayload } from "jsonwebtoken";
+import { Role } from "../../interfaces/common";
 
 interface GetTransactionTypes {
 	filters: FilterQuery<ITransaction>;
 	options?: { limit?: number; page?: number; sort?: string };
+	projection?: string;
 }
 
-const getTransactionsFunc = async ({ filters, options }: GetTransactionTypes) => {
+const getTransactionsFunc = async ({ filters, options, projection }: GetTransactionTypes) => {
 	const { limit = 20, page = 1, sort = "-createdAt" } = options || {};
 
 	const skip = (page - 1) * limit;
 
-	const transactions = await Transaction.find(filters).sort(sort).skip(skip).limit(limit).exec();
+	const transactions = await Transaction.find(filters)
+		.select(projection || "")
+		.sort(sort)
+		.skip(skip)
+		.limit(limit)
+		.exec();
 
 	const total = await Transaction.countDocuments(filters);
 
@@ -27,8 +35,14 @@ const getTransactionsFunc = async ({ filters, options }: GetTransactionTypes) =>
 	};
 };
 
-const getUserTransactions = async (userId: string, options?: { limit?: number; page?: number; sort?: string }) => {
-	return getTransactionsFunc({ filters: { userId }, options });
+const getUserTransactions = async (user: JwtPayload, options?: { limit?: number; page?: number; sort?: string }) => {
+	if (user.role === Role.USER) {
+		return getTransactionsFunc({ filters: { userId: user.userId }, options, projection: "-agentId -commission" });
+	}
+	if (user.role === Role.AGENT) {
+		return getTransactionsFunc({ filters: { agentId: user.userId }, options });
+	}
+	return getTransactionsFunc({ filters: {}, options });
 };
 
 const getWalletTransactions = async (walletId: string, options?: { limit?: number; page?: number; sort?: string }) => {

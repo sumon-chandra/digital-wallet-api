@@ -10,5 +10,7 @@ export interface ITransaction {
 	balanceAfter?: number;
 	receiverId?: Types.ObjectId;
 	senderId?: Types.ObjectId;
+	agentId?: Types.ObjectId;
+	commission?: number;
 	createdAt?: Date;
 }

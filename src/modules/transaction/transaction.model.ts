@@ -12,6 +12,9 @@ const transactionSchema = new Schema<ITransaction>(
 		balanceAfter: { type: Number },
 		receiverId: { type: Schema.Types.ObjectId, ref: "User" },
 		senderId: { type: Schema.Types.ObjectId, ref: "User" },
+
+		agentId: { type: Schema.Types.ObjectId, ref: "User" },
+		commission: { type: Number, default: 0 },
 	},
 	{ timestamps: true, versionKey: false }
 );

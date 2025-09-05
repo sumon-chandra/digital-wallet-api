@@ -6,13 +6,13 @@ import { JwtPayload } from "jsonwebtoken";
 import { TransactionServices } from "./transaction.service";
 
 const getUserTransaction = catchAsync(async (req: Request, res: Response) => {
-	const { userId } = req.user as JwtPayload;
+	const user = req.user as JwtPayload;
 	const filterOptions = {
 		limit: req.query.limit ? parseInt(req.query.limit as string, 10) : undefined,
 		page: req.query.page ? parseInt(req.query.page as string, 10) : undefined,
 		sort: req.query.sort as string | undefined,
 	};
-	const getUserTransactionResponse = await TransactionServices.getUserTransactions(userId, filterOptions);
+	const getUserTransactionResponse = await TransactionServices.getUserTransactions(user, filterOptions);
 
 	sendResponse(res, {
 		success: true,
