@@ -1,10 +1,16 @@
 import httpStatus from "http-status-codes";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import Wallet from "../wallet/wallet.model";
 import { Role, TransactionType } from "../../interfaces/common";
 import AppError from "../../helpers/app-error";
 import { Transaction } from "../transaction/transaction.model";
 import { COMMISSION_RATE } from "./wallet.constant";
+
+interface PaginationOptions {
+	page?: number;
+	limit?: number;
+	skip?: number;
+}
 
 const topUpWallet = async (userId: string, amount: number, role: string) => {
 	if (!userId) throw new AppError(httpStatus.BAD_REQUEST, "User Not Found. Please check the User ID.");
@@ -273,10 +279,41 @@ const cashOut = async (cashOutUserId: string, agentId: string, amount: number, r
 	}
 };
 
+const getAgentCommissionHistory = async (agentId: string, { page = 1, limit = 10 }: PaginationOptions) => {
+	const skip = (page - 1) * limit;
+
+	const commissions = await Transaction.find({ agentId })
+		.select("type amount commission createdAt userId")
+		.sort({ createdAt: -1 })
+		.skip(skip)
+		.limit(limit);
+
+	const totalCommission = await Transaction.aggregate([
+		{
+			$match: {
+				agentId: new Types.ObjectId(agentId),
+			},
+		},
+		{
+			$group: {
+				_id: null,
+				total: { $sum: "$commission" },
+			},
+		},
+	]);
+
+	return {
+		commissions,
+		totalCommission: Math.round(totalCommission[0]?.total) || 0,
+		pagination: { page, limit },
+	};
+};
+
 export const WalletServices = {
 	topUpWallet,
 	withdrawWallet,
 	sendMoney,
 	cashIn,
 	cashOut,
+	getAgentCommissionHistory,
 };

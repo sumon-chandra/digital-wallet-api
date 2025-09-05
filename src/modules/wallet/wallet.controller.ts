@@ -70,10 +70,24 @@ const cashOut = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const getAgentCommissionHistory = catchAsync(async (req: Request, res: Response) => {
+	const { userId } = req.user;
+	const { page, limit } = req.query;
+	const commissionHistory = await WalletServices.getAgentCommissionHistory(userId, { page: Number(page) || 1, limit: Number(limit) || 10 });
+
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.CREATED,
+		message: "Commission History Retrieved Successfully.",
+		data: commissionHistory,
+	});
+});
+
 export const WalletControllers = {
 	topUpWallet,
 	withdrawWallet,
 	sendMoney,
 	cashIn,
 	cashOut,
+	getAgentCommissionHistory,
 };
