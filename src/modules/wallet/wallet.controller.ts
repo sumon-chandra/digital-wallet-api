@@ -83,6 +83,18 @@ const getAgentCommissionHistory = catchAsync(async (req: Request, res: Response)
 	});
 });
 
+const getAllWallets = catchAsync(async (req: Request, res: Response) => {
+	const query = req.query as Record<string, string>;
+	const wallets = await WalletServices.getAllWallets(query);
+
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.CREATED,
+		message: "All Wallets Retrieved Successfully.",
+		data: wallets,
+	});
+});
+
 export const WalletControllers = {
 	topUpWallet,
 	withdrawWallet,
@@ -90,4 +102,5 @@ export const WalletControllers = {
 	cashIn,
 	cashOut,
 	getAgentCommissionHistory,
+	getAllWallets,
 };

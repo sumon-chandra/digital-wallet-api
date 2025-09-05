@@ -5,6 +5,7 @@ import { Role, TransactionType } from "../../interfaces/common";
 import AppError from "../../helpers/app-error";
 import { Transaction } from "../transaction/transaction.model";
 import { COMMISSION_RATE } from "./wallet.constant";
+import { QueryBuilder } from "../../utils/query-builder";
 
 interface PaginationOptions {
 	page?: number;
@@ -309,6 +310,13 @@ const getAgentCommissionHistory = async (agentId: string, { page = 1, limit = 10
 	};
 };
 
+const getAllWallets = async (query: Record<string, string>) => {
+	const queryBuilder = new QueryBuilder(Wallet.find(), query);
+	const wallets = queryBuilder.filter().sort().paginate();
+	const [data, meta] = await Promise.all([wallets.build(), queryBuilder.getMeta()]);
+	return { data, meta };
+};
+
 export const WalletServices = {
 	topUpWallet,
 	withdrawWallet,
@@ -316,4 +324,5 @@ export const WalletServices = {
 	cashIn,
 	cashOut,
 	getAgentCommissionHistory,
+	getAllWallets,
 };

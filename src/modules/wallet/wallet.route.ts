@@ -14,3 +14,6 @@ WalletRouter.post("/send-money", checkAuth(Role.USER), WalletControllers.sendMon
 WalletRouter.post("/cash-in", checkAuth(Role.AGENT), WalletControllers.cashIn);
 WalletRouter.post("/cash-out", checkAuth(Role.AGENT), WalletControllers.cashOut);
 WalletRouter.get("/commission", checkAuth(Role.AGENT), WalletControllers.getAgentCommissionHistory);
+
+// Admin Routes
+WalletRouter.get("/all-wallets", checkAuth(Role.ADMIN), WalletControllers.getAllWallets);
