@@ -37,8 +37,6 @@ The **Digital Wallet API** enables users to register, manage wallets, and perfor
   - **Users**: Add money, Withdraw, Send money (P2P)
   - **Agents**: Cash-in, Cash-out, Commission history
   - **Admins**: View all transactions, approve/suspend agents
-  - Double-entry ledger (debit/credit) for consistency
-  - Idempotency keys to prevent duplicate transfers
 
 <!-- - ⚙️ **System Management**
   - Admin can configure transaction fees & limits
@@ -52,7 +50,7 @@ The **Digital Wallet API** enables users to register, manage wallets, and perfor
 - **Language**: TypeScript
 - **Database**: MongoDB (Mongoose ODM)
 - **Auth**: JWT + bcrypt
-- **Deployment**: Vercel / Any Node.js host
+- **Deployment**: Vercel
 
 ---
 
@@ -115,8 +113,8 @@ The **Digital Wallet API** enables users to register, manage wallets, and perfor
 
 💼 Software Service Executive | 💻 MERN Stack & Backend Developer
 
-[🌐 LinkedIn](https://www.linkedin.com/in/sumonchandra/)
-| [🐦 Twitter (X)](https://x.com/idev_sumon)
-| 📧 idev.sumon@gmail.com
+🌐[LinkedIn](https://www.linkedin.com/in/sumonchandra/)
+| 🐦[Twitter (X)](https://x.com/idev_sumon)
+| 📧idev.sumon@gmail.com
 
 _⚡ Digital Wallet API – Secure, Scalable, and Role-based Wallet Management._
