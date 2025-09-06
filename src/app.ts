@@ -22,7 +22,7 @@ app.use("/api/v1", router);
 app.use(globalErrorHandler);
 
 app.get("/", (req: Request, res: Response) => {
-	res.status(200).send("Welcome to the Tour Management System");
+	res.status(200).send("Welcome to the Digital Wallet API.");
 });
 
 export default app;
