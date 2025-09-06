@@ -1,11 +1,12 @@
 import httpStatus from "http-status-codes";
 import mongoose, { Types } from "mongoose";
 import Wallet from "../wallet/wallet.model";
-import { Role, TransactionType, WalletStatus } from "../../interfaces/common";
+import { AgentStatus, Role, TransactionType, WalletStatus } from "../../interfaces/common";
 import AppError from "../../helpers/app-error";
 import { Transaction } from "../transaction/transaction.model";
 import { COMMISSION_RATE } from "./wallet.constant";
 import { QueryBuilder } from "../../utils/query-builder";
+import { User } from "../user/user.model";
 
 interface PaginationOptions {
 	page?: number;
@@ -188,6 +189,10 @@ const cashIn = async (cashInUserId: string, agentId: string, amount: number, rol
 	session.startTransaction();
 
 	try {
+		const agent = await User.findOne({ _id: agentId, role: Role.AGENT }).session(session);
+		if (agent?.agent?.status === (AgentStatus.SUSPENDED || AgentStatus.INACTIVE))
+			throw new AppError(httpStatus.BAD_REQUEST, `You are not allowed to cash in. Because you account is ${agent?.agent?.status.toLowerCase()}`);
+
 		const userWallet = await Wallet.findOne({ userId: cashInUserId }).session(session);
 		const agentWallet = await Wallet.findOne({ userId: agentId }).session(session);
 
@@ -244,6 +249,10 @@ const cashOut = async (cashOutUserId: string, agentId: string, amount: number, r
 	session.startTransaction();
 
 	try {
+		const agent = await User.findOne({ _id: agentId, role: Role.AGENT }).session(session);
+		if (agent?.agent?.status === (AgentStatus.SUSPENDED || AgentStatus.INACTIVE))
+			throw new AppError(httpStatus.BAD_REQUEST, `You are not allowed to cash out. Because you account is ${agent?.agent?.status.toLowerCase()}`);
+
 		const userWallet = await Wallet.findOne({ userId: cashOutUserId }).session(session);
 		const agentWallet = await Wallet.findOne({ userId: agentId }).session(session);
 

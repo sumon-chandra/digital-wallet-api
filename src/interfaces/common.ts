@@ -13,7 +13,7 @@ export enum IsActive {
 export enum AgentStatus {
 	ACTIVE = "ACTIVE",
 	INACTIVE = "INACTIVE",
-	SUSPEND = "SUSPEND",
+	SUSPENDED = "SUSPENDED",
 }
 
 export enum WalletStatus {
