@@ -23,9 +23,8 @@ const topUpWallet = async (userId: string, amount: number, role: string) => {
 
 	try {
 		const wallet = await Wallet.findOne({ userId }).session(session);
-		if (!wallet) {
-			throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
-		}
+		if (!wallet) throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
+		if (wallet.status === WalletStatus.BLOCKED) throw new AppError(httpStatus.CONFLICT, "Your wallet is blocked. You can not top up to your wallet.");
 
 		const balanceBefore = wallet.balance;
 		wallet.balance += amount;
@@ -69,10 +68,9 @@ const withdrawWallet = async (userId: string, amount: number, role: string) => {
 
 	try {
 		const wallet = await Wallet.findOne({ userId }).session(session);
-		if (!wallet) {
-			throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
-		}
-
+		if (!wallet) throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
+		if (wallet.status === WalletStatus.BLOCKED)
+			throw new AppError(httpStatus.CONFLICT, "Your wallet is blocked. You can not withdraw from your wallet.");
 		if (wallet.balance < amount) throw new AppError(httpStatus.BAD_REQUEST, "Insufficient balance");
 
 		const balanceBefore = wallet.balance;
@@ -119,9 +117,11 @@ const sendMoney = async (senderId: string, receiverId: string, amount: number, r
 
 		const senderWallet = await Wallet.findOne({ userId: senderId }).session(session);
 		const receiverWallet = await Wallet.findOne({ userId: receiverId }).session(session);
-
 		if (!senderWallet || !receiverWallet) throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
-
+		if (senderWallet.status === WalletStatus.BLOCKED)
+			throw new AppError(httpStatus.CONFLICT, "Your wallet is blocked. You cannot send money to others wallet");
+		if (receiverWallet.status === WalletStatus.BLOCKED)
+			throw new AppError(httpStatus.CONFLICT, "Your receiver wallet is blocked. You cannot send money to blocked wallet");
 		if (senderWallet.balance < amount) throw new AppError(httpStatus.BAD_REQUEST, "Insufficient balance");
 
 		const senderBalanceBefore = senderWallet.balance;
@@ -191,7 +191,12 @@ const cashIn = async (cashInUserId: string, agentId: string, amount: number, rol
 		const userWallet = await Wallet.findOne({ userId: cashInUserId }).session(session);
 		const agentWallet = await Wallet.findOne({ userId: agentId }).session(session);
 
-		if (!userWallet || !agentWallet) throw new AppError(httpStatus.NOT_FOUND, "Wallet not found.");
+		if (!userWallet) throw new AppError(httpStatus.NOT_FOUND, "User wallet not found.");
+		if (!agentWallet) throw new AppError(httpStatus.NOT_FOUND, "Agent wallet not found.");
+		if (agentWallet.status === WalletStatus.BLOCKED)
+			throw new AppError(httpStatus.CONFLICT, "Your wallet is blocked. You cannot cash in to others wallet");
+		if (userWallet.status === WalletStatus.BLOCKED)
+			throw new AppError(httpStatus.CONFLICT, "Your receiver wallet is blocked. You cannot cash in to blocked wallet");
 		if (agentWallet.balance < amount) throw new AppError(httpStatus.BAD_REQUEST, "Insufficient agent balance.");
 
 		const commission = amount * COMMISSION_RATE;
@@ -243,6 +248,10 @@ const cashOut = async (cashOutUserId: string, agentId: string, amount: number, r
 		const agentWallet = await Wallet.findOne({ userId: agentId }).session(session);
 
 		if (!userWallet || !agentWallet) throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
+		if (agentWallet.status === WalletStatus.BLOCKED)
+			throw new AppError(httpStatus.CONFLICT, "Your wallet is blocked. You cannot cash out to others wallet");
+		if (userWallet.status === WalletStatus.BLOCKED)
+			throw new AppError(httpStatus.CONFLICT, "Your receiver wallet is blocked. You cannot cash out to blocked wallet");
 		if (userWallet.balance < amount) throw new AppError(httpStatus.BAD_REQUEST, "Insufficient user balance.");
 
 		const commission = Math.round(amount * COMMISSION_RATE);
