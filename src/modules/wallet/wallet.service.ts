@@ -1,7 +1,7 @@
 import httpStatus from "http-status-codes";
 import mongoose, { Types } from "mongoose";
 import Wallet from "../wallet/wallet.model";
-import { Role, TransactionType } from "../../interfaces/common";
+import { Role, TransactionType, WalletStatus } from "../../interfaces/common";
 import AppError from "../../helpers/app-error";
 import { Transaction } from "../transaction/transaction.model";
 import { COMMISSION_RATE } from "./wallet.constant";
@@ -317,6 +317,17 @@ const getAllWallets = async (query: Record<string, string>) => {
 	return { data, meta };
 };
 
+const changeWalletStatus = async (walletId: string, walletStatus: WalletStatus) => {
+	const wallet = await Wallet.findById(walletId);
+	if (!wallet) throw new AppError(httpStatus.NOT_FOUND, "Wallet not found. Check the wallet ID.");
+	if (!Object.values(WalletStatus).includes(walletStatus)) {
+		throw new AppError(httpStatus.BAD_REQUEST, "Invalid wallet status.");
+	}
+
+	wallet.status = walletStatus;
+	await wallet.save();
+};
+
 export const WalletServices = {
 	topUpWallet,
 	withdrawWallet,
@@ -325,4 +336,5 @@ export const WalletServices = {
 	cashOut,
 	getAgentCommissionHistory,
 	getAllWallets,
+	changeWalletStatus,
 };

@@ -89,9 +89,22 @@ const getAllWallets = catchAsync(async (req: Request, res: Response) => {
 
 	sendResponse(res, {
 		success: true,
-		statusCode: httpStatus.CREATED,
+		statusCode: httpStatus.OK,
 		message: "All Wallets Retrieved Successfully.",
 		data: wallets,
+	});
+});
+
+const changeWalletStatus = catchAsync(async (req: Request, res: Response) => {
+	const { id } = req.params;
+	const { walletStatus } = req.body;
+	await WalletServices.changeWalletStatus(id, walletStatus);
+
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "Changed Wallet Status Successfully.",
+		data: null,
 	});
 });
 
@@ -103,4 +116,5 @@ export const WalletControllers = {
 	cashOut,
 	getAgentCommissionHistory,
 	getAllWallets,
+	changeWalletStatus,
 };

@@ -17,3 +17,4 @@ WalletRouter.get("/commission", checkAuth(Role.AGENT), WalletControllers.getAgen
 
 // Admin Routes
 WalletRouter.get("/all-wallets", checkAuth(Role.ADMIN), WalletControllers.getAllWallets);
+WalletRouter.patch("/change-status/:id", checkAuth(Role.ADMIN), WalletControllers.changeWalletStatus);
