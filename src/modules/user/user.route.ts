@@ -9,3 +9,6 @@ export const UserRouter = Router();
 
 UserRouter.post("/register", validateRequest(createUserZodSchema), UserControllers.createUser);
 UserRouter.get("/", checkAuth(Role.ADMIN), UserControllers.getAllUsers);
+
+// Admin Routes
+UserRouter.patch("/change-agent-active-status/:id", checkAuth(Role.ADMIN), UserControllers.changeAgentActiveStatus);

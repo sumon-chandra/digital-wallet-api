@@ -5,7 +5,7 @@ import { IUser } from "./user.interface";
 import { User } from "./user.model";
 import bcrypt from "bcryptjs";
 import { envVars } from "../../config/env";
-import { Role } from "../../interfaces/common";
+import { AgentStatus, Role } from "../../interfaces/common";
 import Wallet from "../wallet/wallet.model";
 
 const INITIAL_WALLET_BALANCE = 50;
@@ -31,7 +31,7 @@ const createUser = async (payload: Partial<IUser>) => {
 		};
 
 		if (role === Role.AGENT) {
-			userData.agent = { isApproved: false };
+			userData.agent = { isApproved: false, status: AgentStatus.ACTIVE };
 		}
 
 		const user = await User.create([userData], { session });
@@ -64,7 +64,22 @@ const getAllUsers = async (): Promise<IUser[]> => {
 	return users;
 };
 
+const changeAgentActiveStatus = async (agentId: string, status: AgentStatus) => {
+	if (!Object.values(AgentStatus).includes(status)) {
+		throw new AppError(httpStatus.BAD_REQUEST, "Invalid status.");
+	}
+
+	const agent = await User.findOne({ _id: agentId, role: Role.AGENT });
+	if (!agent) throw new AppError(httpStatus.NOT_FOUND, "Agent Not Found.");
+
+	if (agent.agent) {
+		agent.agent.status = status;
+	}
+	await agent.save();
+};
+
 export const UserServices = {
 	createUser,
 	getAllUsers,
+	changeAgentActiveStatus,
 };

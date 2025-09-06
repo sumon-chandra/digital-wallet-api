@@ -10,6 +10,12 @@ export enum IsActive {
 	BLOCKED = "BLOCKED",
 }
 
+export enum AgentStatus {
+	ACTIVE = "ACTIVE",
+	INACTIVE = "INACTIVE",
+	SUSPEND = "SUSPEND",
+}
+
 export enum WalletStatus {
 	ACTIVE = "ACTIVE",
 	INACTIVE = "INACTIVE",

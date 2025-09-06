@@ -26,7 +26,21 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const changeAgentActiveStatus = catchAsync(async (req: Request, res: Response) => {
+	const { id } = req.params;
+	const { agentStatus } = req.body;
+	await UserServices.changeAgentActiveStatus(id, agentStatus);
+
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: `Change Agent Active Status to ${agentStatus}`,
+		data: null,
+	});
+});
+
 export const UserControllers = {
 	createUser,
 	getAllUsers,
+	changeAgentActiveStatus,
 };
