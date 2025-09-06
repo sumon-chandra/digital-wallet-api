@@ -5,4 +5,4 @@ import { TransactionControllers } from "./transaction.controller";
 
 export const TransactionRouter = Router();
 
-TransactionRouter.get("/", checkAuth(Role.USER), TransactionControllers.getUserTransaction);
+TransactionRouter.get("/", checkAuth(...Object.values(Role)), TransactionControllers.getUserTransaction);
