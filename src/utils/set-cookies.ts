@@ -11,6 +11,7 @@ export const setAuthCookies = (res: Response, token: TokenInfo) => {
 		secure: true,
 		sameSite: "none",
 		path: "/",
+		maxAge: 7 * 24 * 60 * 60 * 1000,
 	});
 
 	res.cookie("refreshToken", token.refreshToken, {
@@ -18,5 +19,6 @@ export const setAuthCookies = (res: Response, token: TokenInfo) => {
 		secure: true,
 		sameSite: "none",
 		path: "/",
+		maxAge: 7 * 24 * 60 * 60 * 1000,
 	});
 };
