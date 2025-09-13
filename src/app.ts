@@ -15,7 +15,7 @@ const app = express();
 // );
 app.use(
 	cors({
-		origin: ["http://localhost:5173", "https://digital-wallet-client-two.vercel.app"],
+		origin: ["https://digital-wallet-client-two.vercel.app"],
 		credentials: true,
 	})
 );
