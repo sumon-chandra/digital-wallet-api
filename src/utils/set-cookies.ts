@@ -10,17 +10,11 @@ export const setAuthCookies = (res: Response, token: TokenInfo) => {
 		httpOnly: true,
 		secure: true,
 		sameSite: "none",
-		path: "/",
-		maxAge: 7 * 24 * 60 * 60 * 1000,
-		domain: "deg-wallet-api.vercel.app",
 	});
 
 	res.cookie("refreshToken", token.refreshToken, {
 		httpOnly: true,
 		secure: true,
 		sameSite: "none",
-		path: "/",
-		maxAge: 7 * 24 * 60 * 60 * 1000,
-		domain: "deg-wallet-api.vercel.app",
 	});
 };
