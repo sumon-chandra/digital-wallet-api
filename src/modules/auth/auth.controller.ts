@@ -7,7 +7,9 @@ import { AuthServices } from "./auth.service";
 
 const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
 	const loginInfo = await AuthServices.credentialsLogin(req.body);
-	setAuthCookies(res, loginInfo);
+	if(loginInfo.accessToken && loginInfo.refreshToken && loginInfo.user) {
+		setAuthCookies(res, loginInfo);
+	}
 	sendResponse(res, {
 		success: true,
 		statusCode: httpStatus.OK,
