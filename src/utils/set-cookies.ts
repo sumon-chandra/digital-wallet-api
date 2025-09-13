@@ -9,7 +9,7 @@ export const setAuthCookies = (res: Response, token: TokenInfo) => {
 	if (token.accessToken) {
 		res.cookie("accessToken", token.accessToken, {
 			httpOnly: true,
-			secure: false,
+			secure: true,
 			sameSite: "none",
 		});
 	}
@@ -17,7 +17,7 @@ export const setAuthCookies = (res: Response, token: TokenInfo) => {
 	if (token.refreshToken) {
 		res.cookie("refreshToken", token.refreshToken, {
 			httpOnly: true,
-			secure: false,
+			secure: true,
 			sameSite: "none",
 		});
 	}
