@@ -7,7 +7,7 @@ import { AuthServices } from "./auth.service";
 
 const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
 	const loginInfo = await AuthServices.credentialsLogin(req.body);
-	if(loginInfo.accessToken && loginInfo.refreshToken && loginInfo.user) {
+	if (loginInfo.accessToken && loginInfo.refreshToken && loginInfo.user) {
 		setAuthCookies(res, loginInfo);
 	}
 	sendResponse(res, {
@@ -21,13 +21,13 @@ const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
 const logout = catchAsync(async (req: Request, res: Response) => {
 	res.clearCookie("accessToken", {
 		httpOnly: true,
-		secure: false,
-		sameSite: "lax",
+		secure: true,
+		sameSite: "none",
 	});
 	res.clearCookie("refreshToken", {
 		httpOnly: true,
-		secure: false,
-		sameSite: "lax",
+		secure: true,
+		sameSite: "none",
 	});
 
 	sendResponse(res, {
