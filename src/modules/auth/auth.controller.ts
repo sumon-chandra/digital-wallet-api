@@ -18,6 +18,18 @@ const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const getNewUserAccessToken = catchAsync(async (req: Request, res: Response) => {
+	const refreshToken = req.cookies.refreshToken;
+	const tokenInfo = await AuthServices.getNewUserAccessToken(refreshToken as string);
+	setAuthCookies(res, tokenInfo);
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "Get Access Token Successfully!",
+		data: tokenInfo,
+	});
+});
+
 const logout = catchAsync(async (req: Request, res: Response) => {
 	res.clearCookie("accessToken", {
 		httpOnly: true,
@@ -40,5 +52,6 @@ const logout = catchAsync(async (req: Request, res: Response) => {
 
 export const AuthControllers = {
 	credentialsLogin,
+	getNewUserAccessToken,
 	logout,
 };
