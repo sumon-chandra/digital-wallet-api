@@ -57,7 +57,7 @@ The **Digital Wallet API** enables users to register, manage wallets, and perfor
 ## ⚙️ Setup & Environment Instructions
 #### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/digital-wallet-api.git
+git clone https://github.com/sumon-chandra/digital-wallet-api.git
 cd digital-wallet-api
 ```
 #### 2. Install dependencies
@@ -68,25 +68,21 @@ pnpm install
 Inside the root directory, create a ```.env``` file and copy the following variables:
 ```env
 # NODE 
-NODE_ENV=development
-DB_URL=mongodb+srv://digital-wallet-user:digital-wallet-password@cluster2025.dbuw7xd.mongodb.net/DigitalWalletDB
-PORT=5000
+NODE_ENV=
 
 # Express
-EXPRESS_SESSION=4f12fa6b4ec13c9c41ea81d8c2e5df24fa2630fa4a6d37d3e74f12fa6b4ec13c9c4138e7c1a26499c6b865e23
+EXPRESS_SESSION=
 
 # MongoDB
-MONGODB_URI=mongodb+srv://digital-wallet-user:digital-wallet-password@cluster2025.dbuw7xd.mongodb.net/DigitalWalletDB
+DB_URL=
 
 # Bcrypt
-BCRYPT_SALT_ROUND=10
+BCRYPT_SALT_ROUND=
 
 # JWT
-JWT_ACCESS_SECRET=a81f134b37d1ee74f12fa6b4ec13c9c41ea81d8c2e5df24fa2630fa4a6d37db14c6755ec4b938e7c1a26499c6b865e238c6f4c9e1d3198dfb5a8abdf3f57a5de
-JWT_ACCESS_EXPIRES=3d
-
-JWT_REFRESH_SECRET=5df24fa2630fa4a6d3e74f12fa6b4ec13c9c4138e7c1a26499c6b865e238c6f4c9d8c2e5df24fa2630fa4a6d37db14c6755ec4b938e7c1a26499c6b865e23g5rw
-JWT_REFRESH_EXPIRES=30d
+JWT_ACCESS_SECRET=
+JWT_REFRESH_SECRET=
+JWT_REFRESH_EXPIRES=
 ```
 #### 4. Run the application
 ```bash
