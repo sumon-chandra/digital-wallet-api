@@ -5,20 +5,20 @@ export interface TokenInfo {
 	refreshToken?: string;
 }
 
-const cookieOptions = {
-	httpOnly: true,
-	secure: true, // true in production, false in dev
-	sameSite: "none" as const, // cross-site requests
-	path: "/", // available on all backend routes
-	domain: "deg-wallet-api.vercel.app",
-};
-
 export const setAuthCookies = (res: Response, token: TokenInfo) => {
 	if (token.accessToken) {
-		res.cookie("accessToken", token.accessToken, cookieOptions);
+		res.cookie("accessToken", token.accessToken, {
+			httpOnly: true,
+			secure: true,
+			sameSite: "none",
+		});
 	}
 
 	if (token.refreshToken) {
-		res.cookie("refreshToken", token.refreshToken, cookieOptions);
+		res.cookie("refreshToken", token.refreshToken, {
+			httpOnly: true,
+			secure: true,
+			sameSite: "none",
+		});
 	}
 };
