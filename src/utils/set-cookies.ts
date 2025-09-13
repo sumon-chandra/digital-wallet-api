@@ -6,13 +6,19 @@ export interface TokenInfo {
 }
 
 export const setAuthCookies = (res: Response, token: TokenInfo) => {
-	res.cookie("accessToken", token.accessToken, {
-		httpOnly: true,
-		secure: false,
-	});
+	if (token.accessToken) {
+		res.cookie("accessToken", token.accessToken, {
+			httpOnly: true,
+			secure: false,
+			sameSite: "none",
+		});
+	}
 
-	res.cookie("refreshToken", token.refreshToken, {
-		httpOnly: true,
-		secure: false,
-	});
+	if (token.refreshToken) {
+		res.cookie("refreshToken", token.refreshToken, {
+			httpOnly: true,
+			secure: false,
+			sameSite: "none",
+		});
+	}
 };

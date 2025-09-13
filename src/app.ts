@@ -13,7 +13,12 @@ app.use(
 		saveUninitialized: false,
 	})
 );
-app.use(cors());
+app.use(
+	cors({
+		origin: ["http://localhost:5173", "https://digital-wallet-client-two.vercel.app"],
+		credentials: true,
+	})
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
