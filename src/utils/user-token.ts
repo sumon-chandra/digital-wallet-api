@@ -10,6 +10,7 @@ import { IsActive } from "../interfaces/common";
 export const createUserTokens = (user: Partial<IUser>) => {
 	const jwtPayload = {
 		userId: user._id,
+		name: user.name,
 		email: user.email,
 		role: user.role,
 	};
@@ -42,6 +43,7 @@ export const createAccessTokenWithRefreshToken = async (refreshToken: string) =>
 
 	const jwtPayload = {
 		userId: isUserExist._id,
+		name: isUserExist.name,
 		email: isUserExist.email,
 		role: isUserExist.role,
 	};
