@@ -1,7 +1,7 @@
 import { startSession } from "mongoose";
 import httpStatus from "http-status-codes";
 import AppError from "../../helpers/app-error";
-import { IUser } from "./user.interface";
+import { IUser, IUserResponse } from "./user.interface";
 import { User } from "./user.model";
 import bcrypt from "bcryptjs";
 import { envVars } from "../../config/env";
@@ -59,8 +59,52 @@ const createUser = async (payload: Partial<IUser>) => {
 	}
 };
 
-const getAllUsers = async (): Promise<IUser[]> => {
-	const users = await User.find();
+const getAllUsers = async (): Promise<IUserResponse[]> => {
+	const users = await User.aggregate([
+		{
+			$match: {
+				role: Role.USER,
+			},
+		},
+		{
+			$lookup: {
+				from: "wallets",
+				localField: "_id",
+				foreignField: "userId",
+				as: "wallet",
+			},
+		},
+		{
+			$lookup: {
+				from: "transactions",
+				localField: "_id",
+				foreignField: "userId",
+				as: "transactions",
+			},
+		},
+		{
+			$addFields: {
+				balance: { $first: "$wallet.balance" },
+				transactionCount: { $size: "$transactions" },
+				lastActive: { $max: "$transactions.createdAt" },
+			},
+		},
+		{
+			$project: {
+				_id: 0,
+				id: "$_id",
+				name: 1,
+				email: 1,
+				address: 1,
+				balance: 1,
+				transactionCount: "$transactionCount",
+				phone: 1,
+				status: "$isActive",
+				lastActive: { $dateToString: { format: "%d %B %Y", date: "$lastActive" } },
+				joinDate: { $dateToString: { format: "%d %B %Y", date: "$createdAt" } },
+			},
+		},
+	]);
 	return users;
 };
 
