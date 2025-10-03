@@ -108,6 +108,38 @@ const getAllUsers = async (): Promise<IUserResponse[]> => {
 	return users;
 };
 
+const getMe = async (userId: string) => {
+	const user = await User.findById(userId).select("-password");
+	if (!user) {
+		throw new AppError(httpStatus.NOT_FOUND, "User Not Found!");
+	}
+
+	const walletData = await Wallet.aggregate([{ $match: { userId: user._id } }, { $project: { balance: 1, _id: 0 } }]);
+
+	const balance = walletData.length > 0 ? walletData[0].balance : 0;
+
+	return {
+		...user.toObject(),
+		balance,
+	};
+};
+
+const getSingleUser = async (userId: string) => {
+	const user = await User.findById(userId).select("-password");
+	if (!user) {
+		throw new AppError(httpStatus.NOT_FOUND, "User Not Found!");
+	}
+
+	const walletData = await Wallet.aggregate([{ $match: { userId: user._id } }, { $project: { balance: 1, _id: 0 } }]);
+
+	const balance = walletData.length > 0 ? walletData[0].balance : 0;
+
+	return {
+		...user.toObject(),
+		balance,
+	};
+};
+
 const changeAgentActiveStatus = async (agentId: string, status: AgentStatus) => {
 	if (!Object.values(AgentStatus).includes(status)) {
 		throw new AppError(httpStatus.BAD_REQUEST, "Invalid status.");
@@ -126,4 +158,6 @@ export const UserServices = {
 	createUser,
 	getAllUsers,
 	changeAgentActiveStatus,
+	getMe,
+	getSingleUser,
 };

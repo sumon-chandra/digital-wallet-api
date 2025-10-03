@@ -39,8 +39,32 @@ const changeAgentActiveStatus = catchAsync(async (req: Request, res: Response) =
 	});
 });
 
+const getMe = catchAsync(async (req: Request, res: Response) => {
+	const userId = req.user.userId;
+	const user = await UserServices.getMe(userId);
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "User Retrieved Successfully!",
+		data: user,
+	});
+});
+
+const getSingleUser = catchAsync(async (req: Request, res: Response) => {
+	const userId = req.params.id;
+	const user = await UserServices.getSingleUser(userId);
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "User Retrieved Successfully!",
+		data: user,
+	});
+});
+
 export const UserControllers = {
 	createUser,
 	getAllUsers,
 	changeAgentActiveStatus,
+	getMe,
+	getSingleUser,
 };
