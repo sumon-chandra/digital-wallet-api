@@ -65,7 +65,7 @@ const getAllUsers = async (query: UserQuery = {}): Promise<IUserResponse[]> => {
 	const match: Record<string, unknown> = { role: Role.USER };
 	if (search && search.trim()) {
 		const s = search.trim();
-		match.$or = [{ phone: { $regex: s, $options: "i" } }, { email: { $regex: s, $options: "i" } }];
+		match.$or = [{ phone: { $regex: s, $options: "i" } }, { email: { $regex: s, $options: "i" } }, { name: { $regex: s, $options: "i" } }];
 	}
 	if (phone && phone.trim()) {
 		match.phone = { $regex: phone.trim(), $options: "i" };
