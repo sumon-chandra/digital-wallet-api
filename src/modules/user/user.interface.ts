@@ -31,4 +31,5 @@ export interface UserQuery {
 	phone?: string;
 	email?: string;
 	name?: string;
+	search?: string;
 }
