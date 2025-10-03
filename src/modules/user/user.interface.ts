@@ -26,3 +26,9 @@ export interface IUserResponse {
 	lastActive: string | null;
 	transactions: number;
 }
+
+export interface UserQuery {
+	phone?: string;
+	email?: string;
+	name?: string;
+}

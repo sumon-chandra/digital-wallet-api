@@ -1,7 +1,7 @@
 import { startSession } from "mongoose";
 import httpStatus from "http-status-codes";
 import AppError from "../../helpers/app-error";
-import { IUser, IUserResponse } from "./user.interface";
+import { IUser, IUserResponse, UserQuery } from "./user.interface";
 import { User } from "./user.model";
 import bcrypt from "bcryptjs";
 import { envVars } from "../../config/env";
@@ -59,12 +59,24 @@ const createUser = async (payload: Partial<IUser>) => {
 	}
 };
 
-const getAllUsers = async (): Promise<IUserResponse[]> => {
+const getAllUsers = async (query: UserQuery = {}): Promise<IUserResponse[]> => {
+	const { phone, email, name } = query;
+
+	const match: Record<string, unknown> = { role: Role.USER };
+
+	if (phone && phone.trim()) {
+		match.phone = { $regex: phone.trim(), $options: "i" };
+	}
+	if (email && email.trim()) {
+		match.email = { $regex: email.trim(), $options: "i" };
+	}
+	if (name && name.trim()) {
+		match.name = { $regex: name.trim(), $options: "i" };
+	}
+
 	const users = await User.aggregate([
 		{
-			$match: {
-				role: Role.USER,
-			},
+			$match: match,
 		},
 		{
 			$lookup: {

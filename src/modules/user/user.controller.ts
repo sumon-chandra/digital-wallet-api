@@ -3,6 +3,7 @@ import { catchAsync } from "../../utils/catch-async";
 import { sendResponse } from "../../utils/send-response";
 import { UserServices } from "./user.service";
 import httpStatus from "http-status-codes";
+import { UserQuery } from "./user.interface";
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
 	const user = await UserServices.createUser(req.body);
@@ -16,8 +17,8 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-	const users = await UserServices.getAllUsers();
-
+	const query = req.query as UserQuery;
+	const users = await UserServices.getAllUsers(query);
 	sendResponse(res, {
 		success: true,
 		statusCode: httpStatus.OK,
