@@ -27,6 +27,17 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const getUserByPhoneOrEmail = catchAsync(async (req: Request, res: Response) => {
+	const query = req.query.search as string;
+	const user = await UserServices.getUserByPhoneOrEmail({ search: query });
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "User Retrieved Successfully!",
+		data: user,
+	});
+});
+
 const changeAgentActiveStatus = catchAsync(async (req: Request, res: Response) => {
 	const { id } = req.params;
 	const { agentStatus } = req.body;
@@ -68,4 +79,5 @@ export const UserControllers = {
 	changeAgentActiveStatus,
 	getMe,
 	getSingleUser,
+	getUserByPhoneOrEmail,
 };

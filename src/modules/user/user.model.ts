@@ -8,7 +8,7 @@ const userSchema = new Schema<IUser>(
 		email: { type: String, unique: true, required: true },
 		password: { type: String },
 		role: { type: String, enum: Object.values(Role), default: Role.USER },
-		phone: { type: String },
+		phone: { type: String, required: true, unique: true },
 		agent: {
 			isApproved: {
 				type: Boolean,

@@ -155,6 +155,19 @@ const getSingleUser = async (userId: string) => {
 	};
 };
 
+const getUserByPhoneOrEmail = async (query: { search: string }) => {
+	if (!query.search) {
+		throw new AppError(httpStatus.BAD_REQUEST, "Please add Phone number or Email address!!");
+	}
+	const user = await User.findOne({
+		$or: [{ phone: String(query.search) }, { email: String(query.search).toLowerCase() }],
+	}).select("_id name email phone");
+	if (!user) {
+		throw new AppError(httpStatus.NOT_FOUND, "User Not Found by Phone or Email");
+	}
+	return user;
+};
+
 const changeAgentActiveStatus = async (agentId: string, status: AgentStatus) => {
 	if (!Object.values(AgentStatus).includes(status)) {
 		throw new AppError(httpStatus.BAD_REQUEST, "Invalid status.");
@@ -175,4 +188,5 @@ export const UserServices = {
 	changeAgentActiveStatus,
 	getMe,
 	getSingleUser,
+	getUserByPhoneOrEmail,
 };
