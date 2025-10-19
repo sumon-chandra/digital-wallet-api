@@ -123,6 +123,31 @@ const getAllUsers = async (query: UserQuery = {}): Promise<IUserResponse[]> => {
 	return users;
 };
 
+const getAllAgents = async (query: UserQuery = {}): Promise<IUserResponse[]> => {
+	const { phone, email, name, search } = query;
+	const match: Record<string, unknown> = { role: Role.AGENT };
+	if (search && search.trim()) {
+		const s = search.trim();
+		match.$or = [{ phone: { $regex: s, $options: "i" } }, { email: { $regex: s, $options: "i" } }, { name: { $regex: s, $options: "i" } }];
+	}
+	if (phone && phone.trim()) {
+		match.phone = { $regex: phone.trim(), $options: "i" };
+	}
+	if (email && email.trim()) {
+		match.email = { $regex: email.trim(), $options: "i" };
+	}
+	if (name && name.trim()) {
+		match.name = { $regex: name.trim(), $options: "i" };
+	}
+	const agents = await User.aggregate([
+		{
+			$match: match,
+		},
+	]);
+
+	return agents;
+};
+
 const getMe = async (userId: string) => {
 	const user = await User.findById(userId).select("-password");
 	if (!user) {
@@ -185,6 +210,7 @@ const changeAgentActiveStatus = async (agentId: string, status: AgentStatus) => 
 export const UserServices = {
 	createUser,
 	getAllUsers,
+	getAllAgents,
 	changeAgentActiveStatus,
 	getMe,
 	getSingleUser,

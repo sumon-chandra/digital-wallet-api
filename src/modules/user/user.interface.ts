@@ -27,6 +27,17 @@ export interface IUserResponse {
 	transactions: number;
 }
 
+export interface IAgentResponse {
+	id: string;
+	name: string;
+	email: string;
+	phone: string | null;
+	status: IsActive;
+	isApproved: boolean;
+	agentStatus: AgentStatus;
+	joinDate: string;
+}
+
 export interface UserQuery {
 	phone?: string;
 	email?: string;

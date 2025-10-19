@@ -27,6 +27,17 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const getAllAgents = catchAsync(async (req: Request, res: Response) => {
+	const query = req.query as UserQuery;
+	const agents = await UserServices.getAllAgents(query);
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "Agents Retrieved Successfully!",
+		data: agents,
+	});
+});
+
 const getUserByPhoneOrEmail = catchAsync(async (req: Request, res: Response) => {
 	const query = req.query.search as string;
 	const user = await UserServices.getUserByPhoneOrEmail({ search: query });
@@ -76,6 +87,7 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
 export const UserControllers = {
 	createUser,
 	getAllUsers,
+	getAllAgents,
 	changeAgentActiveStatus,
 	getMe,
 	getSingleUser,

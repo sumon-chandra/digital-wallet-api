@@ -9,6 +9,7 @@ export const UserRouter = Router();
 
 UserRouter.post("/register", validateRequest(createUserZodSchema), UserControllers.createUser);
 UserRouter.get("/", checkAuth(Role.ADMIN), UserControllers.getAllUsers);
+UserRouter.get("/agents", checkAuth(Role.ADMIN), UserControllers.getAllAgents);
 UserRouter.get("/me", checkAuth(Role.USER, Role.ADMIN), UserControllers.getMe);
 UserRouter.get("/get-user-by-phone-email", checkAuth(...Object.values(Role)), UserControllers.getUserByPhoneOrEmail);
 

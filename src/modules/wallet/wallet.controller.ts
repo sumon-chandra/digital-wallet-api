@@ -33,6 +33,7 @@ const withdrawWallet = catchAsync(async (req: Request, res: Response) => {
 
 const sendMoney = catchAsync(async (req: Request, res: Response) => {
 	const { amount, receiverId } = req.body;
+	console.log({ sendMoneyReqUser: req.user });
 	const { userId, role } = req.user as JwtPayload;
 	const sendMoneyResponse = await WalletServices.sendMoney(userId, receiverId, amount, role);
 

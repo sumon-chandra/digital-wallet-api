@@ -12,7 +12,6 @@ export const checkAuth =
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const accessToken = req.headers.authorization || req.cookies.accessToken;
-			// console.log({ CheckAuthToken: req.cookies });
 
 			if (!accessToken) {
 				throw new AppError(403, "There is no token received");

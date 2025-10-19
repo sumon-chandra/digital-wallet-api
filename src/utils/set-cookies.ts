@@ -6,7 +6,6 @@ export interface TokenInfo {
 }
 
 export const setAuthCookies = (res: Response, token: TokenInfo) => {
-	// console.log(token);
 	res.cookie("accessToken", token.accessToken, {
 		httpOnly: true,
 		secure: true,
