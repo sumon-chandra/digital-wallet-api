@@ -23,11 +23,13 @@ const getTransactionsFunc = async ({ filters, options, projection }: GetTransact
 		.exec();
 
 	const total = await Transaction.countDocuments(filters);
+	const totalCommission = await Transaction.aggregate([{ $match: filters }, { $group: { _id: null, total: { $sum: "$commission" } } }]);
 
 	return {
 		data: transactions,
 		meta: {
 			total,
+			totalCommission: totalCommission[0]?.total || 0,
 			page,
 			limit,
 			totalPages: Math.ceil(total / limit),
