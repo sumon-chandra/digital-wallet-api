@@ -15,5 +15,6 @@ UserRouter.get("/get-user-by-phone-email", checkAuth(...Object.values(Role)), Us
 
 // Admin Routes
 UserRouter.patch("/change-agent-active-status/:id", checkAuth(Role.ADMIN), UserControllers.changeAgentActiveStatus);
+UserRouter.patch("/update-profile", checkAuth(...Object.values(Role)), UserControllers.updateUser);
 
 UserRouter.get("/:id", checkAuth(...Object.values(Role)), UserControllers.getSingleUser);

@@ -193,6 +193,17 @@ const getUserByPhoneOrEmail = async (query: { search: string }) => {
 	return user;
 };
 
+const updateUser = async (userId: string, payload: Partial<IUser>) => {
+	if (!userId) {
+		throw new AppError(httpStatus.BAD_REQUEST, "User ID is required");
+	}
+	const user = await User.findByIdAndUpdate(userId, payload, { new: true });
+	if (!user) {
+		throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
+	}
+	return user;
+};
+
 const changeAgentActiveStatus = async (agentId: string, status: AgentStatus) => {
 	if (!Object.values(AgentStatus).includes(status)) {
 		throw new AppError(httpStatus.BAD_REQUEST, "Invalid status.");
@@ -215,4 +226,5 @@ export const UserServices = {
 	getMe,
 	getSingleUser,
 	getUserByPhoneOrEmail,
+	updateUser,
 };
