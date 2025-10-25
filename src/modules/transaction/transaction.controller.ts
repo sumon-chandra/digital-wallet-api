@@ -7,12 +7,15 @@ import { TransactionServices } from "./transaction.service";
 
 const getUserTransaction = catchAsync(async (req: Request, res: Response) => {
 	const user = req.user as JwtPayload;
-	const type = req.query.type as string | undefined;
+	const { type, startDate, endDate } = req.query as { type?: string; startDate?: string; endDate?: string };
+
 	const filterOptions = {
 		limit: req.query.limit ? parseInt(req.query.limit as string, 10) : undefined,
 		page: req.query.page ? parseInt(req.query.page as string, 10) : undefined,
 		sort: req.query.sort as string | undefined,
 		type,
+		startDate,
+		endDate,
 	};
 	const getUserTransactionResponse = await TransactionServices.getUserTransactions(user, filterOptions);
 

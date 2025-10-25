@@ -6,14 +6,23 @@ import { Role } from "../../interfaces/common";
 
 interface GetTransactionTypes {
 	filters: FilterQuery<ITransaction>;
-	options?: { limit?: number; page?: number; sort?: string; type?: string };
+	options?: { limit?: number; page?: number; sort?: string; type?: string; startDate?: string; endDate?: string };
 	projection?: string;
 }
 
 const getTransactionsFunc = async ({ filters, options, projection }: GetTransactionTypes) => {
-	const { limit = 20, page = 1, sort = "-createdAt", type } = options || {};
+	const { limit = 20, page = 1, sort = "-createdAt", type, startDate, endDate } = options || {};
 	if (type) {
 		filters.type = type;
+	}
+	if (startDate) {
+		filters.createdAt = { ...filters.createdAt, $gte: new Date(startDate) };
+	}
+	if (endDate) {
+		filters.createdAt = { ...filters.createdAt, $lte: new Date(endDate) };
+	}
+	if (startDate && endDate) {
+		filters.createdAt = { $gte: new Date(startDate), $lte: new Date(endDate) };
 	}
 	const skip = (page - 1) * limit;
 
