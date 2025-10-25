@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 import { envVars } from "../../config/env";
 import { AgentStatus, IsActive, Role } from "../../interfaces/common";
 import Wallet from "../wallet/wallet.model";
-import { usersWithAggregate } from "../../utils/users-with-aggreate";
+import { usersWithAggregate } from "../../utils/users-with-aggregate";
 
 const INITIAL_WALLET_BALANCE = 50;
 

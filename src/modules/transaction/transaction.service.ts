@@ -6,13 +6,15 @@ import { Role } from "../../interfaces/common";
 
 interface GetTransactionTypes {
 	filters: FilterQuery<ITransaction>;
-	options?: { limit?: number; page?: number; sort?: string };
+	options?: { limit?: number; page?: number; sort?: string; type?: string };
 	projection?: string;
 }
 
 const getTransactionsFunc = async ({ filters, options, projection }: GetTransactionTypes) => {
-	const { limit = 20, page = 1, sort = "-createdAt" } = options || {};
-
+	const { limit = 20, page = 1, sort = "-createdAt", type } = options || {};
+	if (type) {
+		filters.type = type;
+	}
 	const skip = (page - 1) * limit;
 
 	const transactions = await Transaction.find(filters)
@@ -37,7 +39,7 @@ const getTransactionsFunc = async ({ filters, options, projection }: GetTransact
 	};
 };
 
-const getUserTransactions = async (user: JwtPayload, options?: { limit?: number; page?: number; sort?: string }) => {
+const getUserTransactions = async (user: JwtPayload, options?: { limit?: number; page?: number; sort?: string; type?: string }) => {
 	if (user.role === Role.USER) {
 		return getTransactionsFunc({ filters: { userId: user.userId }, options, projection: "-agentId -commission" });
 	}
