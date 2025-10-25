@@ -12,9 +12,7 @@ UserRouter.get("/", checkAuth(Role.ADMIN), UserControllers.getAllUsers);
 UserRouter.get("/agents", checkAuth(Role.ADMIN), UserControllers.getAllAgents);
 UserRouter.get("/me", checkAuth(Role.USER, Role.ADMIN), UserControllers.getMe);
 UserRouter.get("/get-user-by-phone-email", checkAuth(...Object.values(Role)), UserControllers.getUserByPhoneOrEmail);
-
-// Admin Routes
 UserRouter.patch("/change-agent-active-status/:id", checkAuth(Role.ADMIN), UserControllers.changeAgentActiveStatus);
 UserRouter.patch("/update-profile", checkAuth(...Object.values(Role)), UserControllers.updateUser);
-
+UserRouter.patch("/change-user-status-role/:id", checkAuth(Role.ADMIN), UserControllers.changeUserStatusRole);
 UserRouter.get("/:id", checkAuth(...Object.values(Role)), UserControllers.getSingleUser);

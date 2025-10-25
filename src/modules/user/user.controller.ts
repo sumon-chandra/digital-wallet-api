@@ -96,6 +96,18 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const changeUserStatusRole = catchAsync(async (req: Request, res: Response) => {
+	const userId = req.params.id;
+	const payload = req.body;
+	await UserServices.changeUserStatusRole(userId, payload);
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "User Status and Role Updated Successfully!",
+		data: null,
+	});
+});
+
 export const UserControllers = {
 	createUser,
 	getAllUsers,
@@ -105,4 +117,5 @@ export const UserControllers = {
 	getSingleUser,
 	getUserByPhoneOrEmail,
 	updateUser,
+	changeUserStatusRole,
 };

@@ -5,7 +5,7 @@ import { IUser, IUserResponse, UserQuery } from "./user.interface";
 import { User } from "./user.model";
 import bcrypt from "bcryptjs";
 import { envVars } from "../../config/env";
-import { AgentStatus, Role } from "../../interfaces/common";
+import { AgentStatus, IsActive, Role } from "../../interfaces/common";
 import Wallet from "../wallet/wallet.model";
 
 const INITIAL_WALLET_BALANCE = 50;
@@ -219,6 +219,23 @@ const changeAgentActiveStatus = async (agentId: string, status: AgentStatus) => 
 	await agent.save();
 };
 
+const changeUserStatusRole = async (userId: string, payload: { status: IsActive; role: Role }) => {
+	if (payload.role && !Object.values(Role).includes(payload.role)) {
+		throw new AppError(httpStatus.BAD_REQUEST, "Invalid role.");
+	}
+
+	if (payload.status && !Object.values(IsActive).includes(payload.status)) {
+		throw new AppError(httpStatus.BAD_REQUEST, "Invalid status.");
+	}
+
+	const user = await User.findById(userId);
+	if (!user) throw new AppError(httpStatus.NOT_FOUND, "User Not Found.");
+
+	if (payload.status) user.isActive = payload.status;
+	if (payload.role) user.role = payload.role;
+	await user.save();
+};
+
 export const UserServices = {
 	createUser,
 	getAllUsers,
@@ -228,4 +245,5 @@ export const UserServices = {
 	getSingleUser,
 	getUserByPhoneOrEmail,
 	updateUser,
+	changeUserStatusRole,
 };
