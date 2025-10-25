@@ -111,6 +111,7 @@ const getAllUsers = async (query: UserQuery = {}): Promise<IUserResponse[]> => {
 				name: 1,
 				email: 1,
 				address: 1,
+				isEmailVerified: 1,
 				balance: 1,
 				transactionCount: "$transactionCount",
 				phone: 1,
