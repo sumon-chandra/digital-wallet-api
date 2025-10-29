@@ -3,7 +3,6 @@ import { catchAsync } from "../../utils/catch-async";
 import { sendResponse } from "../../utils/send-response";
 import { UserServices } from "./user.service";
 import httpStatus from "http-status-codes";
-import { UserQuery } from "./user.interface";
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
 	const user = await UserServices.createUser(req.body);
@@ -17,7 +16,7 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-	const query = req.query as UserQuery;
+	const query = req.query as Record<string, string>;
 	const users = await UserServices.getAllUsers(query);
 	sendResponse(res, {
 		success: true,
@@ -28,7 +27,7 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllAgents = catchAsync(async (req: Request, res: Response) => {
-	const query = req.query as UserQuery;
+	const query = req.query as Record<string, string>;
 	const agents = await UserServices.getAllAgents(query);
 	sendResponse(res, {
 		success: true,
