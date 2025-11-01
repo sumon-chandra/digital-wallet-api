@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 import { envVars } from "../../config/env";
 import { AgentStatus, IsActive, Role } from "../../interfaces/common";
 import Wallet from "../wallet/wallet.model";
-import { QueryBuilder } from "../../utils/query-builder";
+import { usersWithAggregate } from "../../utils/users-with-aggregate";
 
 const INITIAL_WALLET_BALANCE = 50;
 
@@ -61,17 +61,13 @@ const createUser = async (payload: Partial<IUser>) => {
 };
 
 const getAllUsers = async (query: Record<string, string>) => {
-	const queryBuilder = new QueryBuilder(User.find({ role: Role.USER }), query);
-	const users = queryBuilder.filter().sort().paginate();
-	const [data, meta] = await Promise.all([users.build(), queryBuilder.getMeta()]);
-	return { data, meta };
+	const users = usersWithAggregate({ role: Role.USER, query });
+	return users;
 };
 
 const getAllAgents = async (query: Record<string, string>) => {
-	const queryBuilder = new QueryBuilder(User.find({ role: Role.AGENT }), query);
-	const agents = queryBuilder.filter().sort().paginate();
-	const [data, meta] = await Promise.all([agents.build(), queryBuilder.getMeta()]);
-	return { data, meta };
+	const agents = usersWithAggregate({ role: Role.AGENT, query });
+	return agents;
 };
 
 const getMe = async (userId: string) => {

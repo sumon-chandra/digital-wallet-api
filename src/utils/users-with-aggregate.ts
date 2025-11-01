@@ -4,6 +4,8 @@ import { User } from "../modules/user/user.model";
 interface UsersWithAggregateOptions {
 	role: Role;
 	query: {
+		page?: string;
+		limit?: string;
 		phone?: string;
 		email?: string;
 		name?: string;
@@ -14,6 +16,12 @@ interface UsersWithAggregateOptions {
 export async function usersWithAggregate({ role, query }: UsersWithAggregateOptions) {
 	const { phone, email, name, search } = query;
 
+	// Pagination setup
+	const page = Number(query.page) || 1;
+	const limit = Number(query.limit) || 20;
+	const skip = (page - 1) * limit;
+
+	// Filtering setup
 	const match: Record<string, unknown> = { role };
 	if (search && search.trim()) {
 		const s = search.trim();
@@ -29,10 +37,9 @@ export async function usersWithAggregate({ role, query }: UsersWithAggregateOpti
 		match.name = { $regex: name.trim(), $options: "i" };
 	}
 
-	const users = await User.aggregate([
-		{
-			$match: match,
-		},
+	// Aggregation pipeline with $facet for pagination + meta
+	const result = await User.aggregate([
+		{ $match: match },
 		{
 			$lookup: {
 				from: "wallets",
@@ -65,14 +72,32 @@ export async function usersWithAggregate({ role, query }: UsersWithAggregateOpti
 				address: 1,
 				isEmailVerified: 1,
 				balance: 1,
-				transactionCount: "$transactionCount",
+				transactionCount: 1,
 				phone: 1,
 				status: "$isActive",
 				lastActive: { $dateToString: { format: "%d %B %Y", date: "$lastActive" } },
 				joinDate: { $dateToString: { format: "%d %B %Y", date: "$createdAt" } },
 			},
 		},
+		{
+			$facet: {
+				data: [{ $skip: skip }, { $limit: limit }],
+				totalCount: [{ $count: "total" }],
+			},
+		},
 	]);
 
-	return users;
+	const data = result[0]?.data || [];
+	const totalDocuments = result[0]?.totalCount?.[0]?.total || 0;
+	const totalPages = Math.ceil(totalDocuments / limit);
+
+	return {
+		data,
+		meta: {
+			total: totalDocuments,
+			page,
+			limit,
+			totalPages,
+		},
+	};
 }
