@@ -10,11 +10,13 @@ interface UsersWithAggregateOptions {
 		email?: string;
 		name?: string;
 		search?: string;
+		status?: string;
+		emailVerified?: string;
 	};
 }
 
 export async function usersWithAggregate({ role, query }: UsersWithAggregateOptions) {
-	const { phone, email, name, search } = query;
+	const { phone, email, name, search, status, emailVerified } = query;
 
 	// Pagination setup
 	const page = Number(query.page) || 1;
@@ -25,7 +27,18 @@ export async function usersWithAggregate({ role, query }: UsersWithAggregateOpti
 	const match: Record<string, unknown> = { role };
 	if (search && search.trim()) {
 		const s = search.trim();
-		match.$or = [{ phone: { $regex: s, $options: "i" } }, { email: { $regex: s, $options: "i" } }, { name: { $regex: s, $options: "i" } }];
+		match.$or = [
+			{ phone: { $regex: s, $options: "i" } },
+			{ email: { $regex: s, $options: "i" } },
+			{ name: { $regex: s, $options: "i" } },
+			{ address: { $regex: s, $options: "i" } },
+		];
+	}
+	if (status && status.trim()) {
+		match.isActive = { $regex: `^${status.trim()}$`, $options: "i" };
+	}
+	if (emailVerified && emailVerified.trim()) {
+		match.isEmailVerified = emailVerified.trim().toUpperCase() === "VERIFIED";
 	}
 	if (phone && phone.trim()) {
 		match.phone = { $regex: phone.trim(), $options: "i" };
