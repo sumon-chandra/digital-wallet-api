@@ -108,6 +108,7 @@ const getUserByPhoneOrEmail = async (query: { search: string }) => {
 	}
 	const user = await User.findOne({
 		$or: [{ phone: String(query.search) }, { email: String(query.search).toLowerCase() }],
+		role: "USER",
 	}).select("_id name email phone");
 	if (!user) {
 		throw new AppError(httpStatus.NOT_FOUND, "User Not Found by Phone or Email");
