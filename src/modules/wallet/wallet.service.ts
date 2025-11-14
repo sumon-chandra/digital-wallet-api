@@ -239,9 +239,9 @@ const cashIn = async (cashInUserId: string, agentId: string, amount: number, rol
 	}
 };
 
-const cashOut = async (cashOutUserId: string, agentId: string, amount: number, role: string) => {
-	if (!cashOutUserId) throw new AppError(httpStatus.BAD_REQUEST, "User Not Found. Please check the User ID.");
-	if (!agentId) throw new AppError(httpStatus.BAD_REQUEST, "Agent Not Found. Please check the Agent ID.");
+const cashOut = async (agentId: string, userId: string, amount: number, role: string) => {
+	if (!agentId) throw new AppError(httpStatus.BAD_REQUEST, "User Not Found. Please check the User ID.");
+	if (!userId) throw new AppError(httpStatus.BAD_REQUEST, "Agent Not Found. Please check the Agent ID.");
 	if (role !== Role.USER) throw new AppError(httpStatus.FORBIDDEN, "Only agents can perform cash-out operations.");
 	if (amount < 1) throw new AppError(httpStatus.BAD_REQUEST, "You must cash out at least 1.");
 
@@ -249,11 +249,11 @@ const cashOut = async (cashOutUserId: string, agentId: string, amount: number, r
 	session.startTransaction();
 
 	try {
-		const agent = await User.findOne({ _id: agentId, role: Role.AGENT }).session(session);
+		const agent = await User.findOne({ _id: userId, role: Role.AGENT }).session(session);
 		if (agent?.agent?.status === (AgentStatus.SUSPENDED || AgentStatus.INACTIVE))
 			throw new AppError(httpStatus.BAD_REQUEST, `You are not allowed to cash out. Because you account is ${agent?.agent?.status.toLowerCase()}`);
 
-		const userWallet = await Wallet.findOne({ userId: cashOutUserId }).session(session);
+		const userWallet = await Wallet.findOne({ userId: userId }).session(session);
 		const agentWallet = await Wallet.findOne({ userId: agentId }).session(session);
 
 		if (!userWallet || !agentWallet) throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
@@ -274,13 +274,13 @@ const cashOut = async (cashOutUserId: string, agentId: string, amount: number, r
 		await Transaction.create(
 			[
 				{
-					userId: cashOutUserId,
+					userId: userId,
 					walletId: userWallet._id,
 					type: TransactionType.CASH_OUT,
 					amount,
 					balanceBefore: userWallet.balance + amount,
 					balanceAfter: userWallet.balance,
-					agentId,
+					agentId: agentId,
 					commission,
 				},
 			],
