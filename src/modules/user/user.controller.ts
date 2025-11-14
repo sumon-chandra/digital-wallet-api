@@ -48,6 +48,17 @@ const getUserByPhoneOrEmail = catchAsync(async (req: Request, res: Response) => 
 	});
 });
 
+const selectUserForTransaction = catchAsync(async (req: Request, res: Response) => {
+	const { search, method, role } = req.query as Record<string, string>;
+	const user = await UserServices.selectUserForTransaction({ search, method, role });
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "User Retrieved Successfully!",
+		data: user,
+	});
+});
+
 const changeAgentActiveStatus = catchAsync(async (req: Request, res: Response) => {
 	const { id } = req.params;
 	const { agentStatus } = req.body;
@@ -117,4 +128,5 @@ export const UserControllers = {
 	getUserByPhoneOrEmail,
 	updateUser,
 	changeUserStatusRole,
+	selectUserForTransaction,
 };

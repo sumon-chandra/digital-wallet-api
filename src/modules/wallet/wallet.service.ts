@@ -242,7 +242,7 @@ const cashIn = async (cashInUserId: string, agentId: string, amount: number, rol
 const cashOut = async (cashOutUserId: string, agentId: string, amount: number, role: string) => {
 	if (!cashOutUserId) throw new AppError(httpStatus.BAD_REQUEST, "User Not Found. Please check the User ID.");
 	if (!agentId) throw new AppError(httpStatus.BAD_REQUEST, "Agent Not Found. Please check the Agent ID.");
-	if (role !== Role.AGENT) throw new AppError(httpStatus.FORBIDDEN, "Only agents can perform cash-out operations.");
+	if (role !== Role.USER) throw new AppError(httpStatus.FORBIDDEN, "Only agents can perform cash-out operations.");
 	if (amount < 1) throw new AppError(httpStatus.BAD_REQUEST, "You must cash out at least 1.");
 
 	const session = await mongoose.startSession();

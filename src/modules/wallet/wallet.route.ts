@@ -9,10 +9,10 @@ export const WalletRouter = Router();
 WalletRouter.post("/top-up", checkAuth(Role.USER), WalletControllers.topUpWallet);
 WalletRouter.post("/withdraw", checkAuth(Role.USER), WalletControllers.withdrawWallet);
 WalletRouter.post("/send-money", checkAuth(Role.USER), WalletControllers.sendMoney);
+WalletRouter.post("/cash-out", checkAuth(Role.USER), WalletControllers.cashOut);
 
 // Agent Routes
 WalletRouter.post("/cash-in", checkAuth(Role.AGENT), WalletControllers.cashIn);
-WalletRouter.post("/cash-out", checkAuth(Role.AGENT), WalletControllers.cashOut);
 WalletRouter.get("/commission", checkAuth(Role.AGENT), WalletControllers.getAgentCommissionHistory);
 
 // Admin Routes

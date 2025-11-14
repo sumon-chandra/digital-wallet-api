@@ -109,9 +109,39 @@ const getUserByPhoneOrEmail = async (query: { search: string }) => {
 	const user = await User.findOne({
 		$or: [{ phone: String(query.search) }, { email: String(query.search).toLowerCase() }],
 		role: "USER",
-	}).select("_id name email phone");
+	}).select("_id name email phone role");
 	if (!user) {
 		throw new AppError(httpStatus.NOT_FOUND, "User Not Found by Phone or Email");
+	}
+	return user;
+};
+
+const selectUserForTransaction = async (query: { search: string; method: string; role: string }) => {
+	const { search, method } = query;
+	if (!search) {
+		throw new AppError(httpStatus.BAD_REQUEST, "Please add Phone number or Email address!!");
+	}
+
+	const user = await User.findOne({
+		$or: [{ phone: String(search) }, { email: String(search).toLowerCase() }],
+	}).select("_id name email phone role");
+	if (!user) {
+		throw new AppError(httpStatus.NOT_FOUND, "User Not Found by Phone or Email");
+	}
+	if (method === "Withdraw") {
+		if (method === "Withdraw" && user.role !== Role.AGENT) {
+			throw new AppError(httpStatus.NOT_FOUND, "User Not Found with Cash Out");
+		}
+	}
+	if (method === "Transfer") {
+		if (method === "Transfer" && user.role !== Role.USER) {
+			throw new AppError(httpStatus.NOT_FOUND, "User Not Found with Sent Money");
+		}
+	}
+	if (method === "Add") {
+		if (method === "Add" && user.role !== Role.USER) {
+			throw new AppError(httpStatus.NOT_FOUND, "User Not Found with Cash In");
+		}
 	}
 	return user;
 };
@@ -168,4 +198,5 @@ export const UserServices = {
 	getUserByPhoneOrEmail,
 	updateUser,
 	changeUserStatusRole,
+	selectUserForTransaction,
 };
