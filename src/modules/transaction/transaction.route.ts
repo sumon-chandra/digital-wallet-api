@@ -6,3 +6,4 @@ import { TransactionControllers } from "./transaction.controller";
 export const TransactionRouter = Router();
 
 TransactionRouter.get("/", checkAuth(...Object.values(Role)), TransactionControllers.getUserTransaction);
+TransactionRouter.get("/summery", checkAuth(...Object.values(Role)), TransactionControllers.getDateWiseTransactionSummary);

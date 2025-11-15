@@ -44,7 +44,22 @@ const getWalletTransaction = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const getDateWiseTransactionSummary = catchAsync(async (req: Request, res: Response) => {
+	const { userId, role } = req.user as JwtPayload;
+	const { startDate, endDate } = req.params as Record<string, string>;
+
+	const transactionSummery = await TransactionServices.getDateWiseTransactionSummary({ startDate, endDate, userId, role });
+
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "Get Wallet Transaction Summery Report!",
+		data: transactionSummery,
+	});
+});
+
 export const TransactionControllers = {
 	getUserTransaction,
 	getWalletTransaction,
+	getDateWiseTransactionSummary,
 };
